@@ -220,12 +220,15 @@ def _aoc_main() -> None:
         if which is None:
             print("Guessing paste kind from your clipboard metadata...")
             types = subprocess.check_output(("wl-paste", "-l")).decode().split()
-            if "text/x-moz-url-priv" not in types:
+            if "text/x-moz-url-priv" in types:
+                url = subprocess.check_output(("wl-paste", "-t", "text/x-moz-url-priv")).decode().strip().replace("\0", "")
+            elif "chromium/x-source-url" in types:
+                url = subprocess.check_output(("wl-paste", "-t", "chromium/x-source-url")).decode().strip()
+            else:
                 today = datetime.date.today()
                 theyear = today.year
                 theday = day or today.day
                 raise SystemExit(f"Please copy the sample data from https://adventofcode.com/{theyear}/day/{theday}")
-            url = subprocess.check_output(("wl-paste", "-t", "text/x-moz-url-priv")).decode().strip().replace("\0", "")
             urlinputmo = re.fullmatch(r'^https://adventofcode\.com/(\d+)/day/(\d+)(/input)?$', url)
             if not urlinputmo:
                 raise SystemExit(f"You appear to have copied some data from an unknown URL: {url!r}\n\nPlease copy the sample data directly from the AOC website, or copy the test data and run with -p samp or -p test")
