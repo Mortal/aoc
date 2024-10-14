@@ -1,21 +1,11 @@
-with open("d22.in") as fp:
-    inp = fp.read()
-if 0:
-    inp = """1,0,1~1,2,1
-0,0,2~2,0,2
-0,2,3~2,2,3
-0,0,4~0,2,4
-2,0,5~2,2,5
-0,1,6~2,1,6
-1,1,8~1,1,9
-"""
+from aoc import lines
 xs: list[range] = []
 ys: list[range] = []
 z1: list[int] = []
 z2: list[int] = []
 bricks: dict[tuple[int, int], list[int]] = {}
 
-for i, line in enumerate(inp.strip().splitlines()):
+for i, line in enumerate(lines):
     p,q = line.split("~")
     a,b,c = map(int, p.split(","))
     x,y,z = map(int, q.split(","))

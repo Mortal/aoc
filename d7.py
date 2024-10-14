@@ -1,14 +1,5 @@
+from aoc import lines
 import collections
-
-with open("d7.in") as fp:
-    inp = fp.read().strip().splitlines()
-if 0:
-    inp = """32T3K 765
-T55J5 684
-KK677 28
-KTJJT 220
-QQQJA 483
-""".strip().splitlines()
 
 order = "AKQT98765432J"[::-1]
 
@@ -40,6 +31,6 @@ def keyfun(s: str) -> tuple[int, tuple[int, ...]]:
         return 5, indices
     return 0, indices
 
-inp.sort(key=keyfun)
-print("\n".join(f"{s} {keyfun(s)[0]}" for s in inp))
-print(sum(i * int(s[6:]) for i, s in enumerate(inp, 1)))
+lines.sort(key=keyfun)
+print("\n".join(f"{s} {keyfun(s)[0]}" for s in lines))
+print(sum(i * int(s[6:]) for i, s in enumerate(lines, 1)))

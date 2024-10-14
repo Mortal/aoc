@@ -1,15 +1,8 @@
-with open("d9.in") as fp:
-    inp = fp.read()
-if 0:
-    inp = """0 3 6 9 12 15
-1 3 6 10 15 21
-10 13 16 21 30 45
-"""
-
+from aoc import lines
 import numpy as np
 
 s = 0
-for line in inp.strip().splitlines():
+for line in lines:
     xs = [np.fromiter(map(int, line.split()), dtype=np.intp)]
     while np.any(xs[-1] != 0):
         xs.append(np.diff(xs[-1]))
@@ -21,7 +14,7 @@ for line in inp.strip().splitlines():
 print(s)
 
 s = 0
-for line in inp.strip().splitlines():
+for line in lines:
     xs = [np.fromiter(map(int, line.split()), dtype=np.intp)]
     while np.any(xs[-1] != 0):
         xs.append(np.diff(xs[-1]))

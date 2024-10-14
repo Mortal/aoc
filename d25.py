@@ -1,25 +1,8 @@
 from typing import Callable, Iterable
-
-with open("d25.in") as fp:
-    inp = fp.read()
-if 0:
-    inp = """jqt: rhn xhk nvd
-rsh: frs pzl lsr
-xhk: hfx
-cmg: qnr nvd lhk bvb
-rhn: xhk bvb hfx
-bvb: xhk hfx
-pzl: lsr hfx nvd
-qnr: nvd
-ntq: jqt hfx bvb xhk
-nvd: lhk
-lsr: lhk
-rzs: qnr cmg lsr rsh
-frs: qnr lhk lsr
-"""
+from aoc import lines
 
 edgelists: dict[str, dict[str, int]] = {}
-for line in inp.strip().splitlines():
+for line in lines:
     a, bs = line.split(":")
     for b in bs.split():
         edgelists.setdefault(a, {})[b] = 1

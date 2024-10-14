@@ -1,24 +1,5 @@
+from aoc import lines, mat
 import string
-
-with open("d3.in") as fp:
-    lines = fp.read().split()
-if 0:
-    lines = """467..114..
-...*......
-..35..633.
-......#...
-617*......
-.....+.58.
-..592.....
-......755.
-...$.*....
-.664.598..""".split()
-
-def read(ij):
-    i, j = ij
-    if 0 <= i < len(lines) and 0 <= j < len(lines[i]):
-        return lines[i][j]
-    return ''
 
 def num(ij):
     i, j = ij
@@ -35,18 +16,14 @@ def readnum(ij):
         v += int(lines[i][j])
     return v
 
-def neighbors(ij):
-    i, j = ij
-    return [(i + a, j + b) for a in (-1, 0, 1) for b in (-1, 0, 1) if not a == b == 0]
-
 gears = []
 nums = set()
 for i in range(len(lines)):
     for j in range(len(lines[i])):
         if lines[i][j] == "*":
             myneigh = set()
-            for n in neighbors((i, j)):
-                if read(n) not in string.digits:
+            for n in mat.neigh8((i, j)):
+                if mat.read(n) not in string.digits:
                     continue
                 myneigh.add(num(n))
             if len(myneigh) == 2:
@@ -56,9 +33,9 @@ for i in range(len(lines)):
             continue
         if num((i, j)) in nums:
             continue
-        for n in neighbors((i, j)):
-            if read(n) not in ["", ".", *string.digits]:
-                print(num((i, j)), readnum(num((i, j))), repr(n), repr(read(n)))
+        for n in mat.neigh8((i, j)):
+            if mat.read(n) not in ["", ".", *string.digits]:
+                print(num((i, j)), readnum(num((i, j))), repr(n), repr(mat.read(n)))
                 nums.add(num((i, j)))
                 break
 print([readnum(ij) for ij in nums])

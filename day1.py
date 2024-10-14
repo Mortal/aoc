@@ -1,20 +1,13 @@
-with open("day1.in") as fp:
-    s = fp.read()
-# s = """two1nine
-# eightwothree
-# abcone2threexyz
-# xtwone3four
-# 4nineeightseven2
-# zoneight234
-# 7pqrstsixteen
-# """
+from aoc import inp, lines
+
 import re
+
+
 names = "one|two|three|four|five|six|seven|eight|nine".split("|")
-#s = re.sub("one|two|three|four|five|six|seven|eight|nine", lambda mo: str(names.index(mo.group()) + 1), s)
-#s = re.sub(r'[^0-9\n]', '', s)
-print(repr(s)[:50])
+#inp = re.sub("one|two|three|four|five|six|seven|eight|nine", lambda mo: str(names.index(mo.group()) + 1), inp)
+#inp = re.sub(r'[^0-9\n]', '', inp)
 numbers: list[int] = []
-for line in s.splitlines():
+for line in lines:
     firstpos, first = min(
         [(line.find(str(i + 1)), i + 1)
          for i in range(9)

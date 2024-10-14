@@ -1,16 +1,10 @@
-with open("d24.in") as fp:
-    inp = fp.read()
+from aoc import inp, path
+if "test" in path:
     xmin = 200000000000000
     xmax = 400000000000000
-if 0:
+else:
     xmin = 7
     xmax = 27
-    inp = """19, 13, 30 @ -2,  1, -2
-18, 19, 22 @ -1, -1, -2
-20, 25, 34 @ -2, -2, -4
-12, 31, 28 @ -1, -2, -1
-20, 19, 15 @  1, -5, -3
-"""
 hail2d = []
 for line in inp.strip().splitlines():
     px,py,pz,vx,vy,vz = map(int, line.replace(",", " ").replace("@"," ").split())

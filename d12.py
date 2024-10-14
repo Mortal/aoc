@@ -1,20 +1,11 @@
-with open("d12.in") as fp:
-    inp = fp.read()
-if 0:
-    inp = """???.### 1,1,3
-.??..??...?##. 1,1,3
-?#?#?#?#?#?#?#? 1,3,1,6
-????.#...#... 4,1,1
-????.######..#####. 1,6,5
-?###???????? 3,2,1
-"""
+from aoc import lines
 
 def patterns_endswith(chars: str, pattern: str, i: int, j: int) -> bool:
     assert 0 <= i <= j <= len(chars)
     return j - i >= len(pattern) and all(chars[j - k] in ("?", pattern[-k]) for k in range(1, len(pattern) + 1))
 
 totalsum = 0
-for line in inp.strip().splitlines():
+for line in lines:
     chars, nums_str = line.split()
     nums = list(map(int, nums_str.split(",")))
     chars = "?".join([chars]*5)

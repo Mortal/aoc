@@ -1,46 +1,22 @@
-with open("d21.in") as fp:
-    inp = fp.read()
-    steps = 26501365
-if 0:
-    inp = """...........
-.....###.#.
-.###.##..#.
-..#.#...#..
-....#.#....
-.##..S####.
-.##..#...#.
-.......##..
-.##.#.####.
-.##..##.##.
-...........
-"""
-    steps = 6
+from aoc import path, lines, ComplexStringMatrix
 
-rows = inp.strip().splitlines()
+steps = 26501365 if "test" in path else 6
 rep = 5
 steps *= rep
-rows = rep * [rep * line for line in rows]
-n = len(rows)
-m = len(rows[0])
-ss = [complex(j, i) for i, row in enumerate(rows) for j, c in enumerate(row) if c == "S"]
+cmat = ComplexStringMatrix(rep * [rep * line for line in lines])
+n, m = cmat.shape
+ss = cmat.findall("S")
 s = ss[len(ss)//2]
 bfs = [s]
 dists = {s: 0}
 i = 0
 dirs = [1,-1,1j,-1j]
 
-def read(pos: complex) -> str:
-    i = int(pos.imag)
-    j = int(pos.real)
-    if 0 <= i < n and 0 <= j < m:
-        return rows[i][j]
-    return "-"
-
 while i < len(bfs):
     pos = bfs[i]
     i += 1
     for d in dirs:
-        if read(pos + d) in (".", "S") and pos + d not in dists:
+        if cmat.read(pos + d) in (".", "S") and pos + d not in dists:
             dists[pos + d] = dists[pos] + 1
             bfs.append(pos + d)
 
@@ -60,7 +36,7 @@ def overdist(i: int, j: int) -> int:
 
 count = 0
 cases = {(b, d): 0 for b in range(n // rep) for d in range(n // rep)}
-for i, row in enumerate(rows):
+for i, row in enumerate(cmat):
     printout = ["."] * m
     printout = list(row)
     for j in range(m):

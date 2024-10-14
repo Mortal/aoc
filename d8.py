@@ -1,17 +1,4 @@
-with open("d8.in") as fp:
-    inp = fp.read()
-if 0:
-    inp = """LR
-
-11A = (11B, XXX)
-11B = (XXX, 11Z)
-11Z = (11B, XXX)
-22A = (22B, XXX)
-22B = (22C, 22C)
-22C = (22Z, 22Z)
-22Z = (22B, 22B)
-XXX = (XXX, XXX)
-"""
+from aoc import inp
 
 dirs, lines = inp.strip().split("\n\n")
 insns = {line[:3]: (line[7:10], line[12:15]) for line in lines.strip().splitlines()}

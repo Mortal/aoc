@@ -1,7 +1,4 @@
-with open("d15.in") as fp:
-    inp = fp.read()
-if 0:
-    inp = "rn=1,cm-,qp=3,cm=2,qp-,pc=4,ot=9,ab=5,pc-,pc=6,ot=7"
+from aoc import inp
 
 def thehash(part: str) -> int:
     h = 0
@@ -9,7 +6,7 @@ def thehash(part: str) -> int:
         h = (h + ord(c)) * 17 % 256
     return h
 
-boxes = {}
+boxes: dict[int, dict[str, int]] = {}
 for part in inp.strip().split(","):
     if "=" in part:
         label, fole_str = part.split("=")

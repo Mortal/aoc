@@ -1,22 +1,7 @@
-with open("d20.in") as fp:
-    inp = fp.read()
-if 0:
-    inp = """broadcaster -> a, b, c
-%a -> b
-%b -> c
-%c -> inv
-&inv -> a
-"""
-elif 0:
-    inp = """broadcaster -> a
-%a -> inv, con
-&inv -> b
-%b -> con
-&con -> output
-"""
+from aoc import lines
 config: dict[str, list[str]] = {}
 typ: dict[str, str] = {}
-for line in inp.strip().splitlines():
+for line in lines:
     signame, targets_str = line.split(" -> ")
     name = signame.strip("%&")
     typ[name] = signame

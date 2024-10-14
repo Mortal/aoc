@@ -1,26 +1,6 @@
-with open("d11.in") as fp:
-    inp = fp.read()
-if 0:
-    inp = """...#......
-.......#..
-#.........
-..........
-......#...
-.#........
-.........#
-..........
-.......#..
-#...#.....
-"""
-lines = inp.strip().splitlines()
-n = len(lines)
-m = len(lines[0])
-galaxies = [
-    (i, j)
-    for i, line in enumerate(lines)
-    for j, c in enumerate(line)
-    if c == "#"
-]
+from aoc import mat
+n, m = mat.shape
+galaxies = mat.findall("#")
 rowset = {i for i, j in galaxies}
 colset = {j for i, j in galaxies}
 rowtorow = [0]

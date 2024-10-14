@@ -1,38 +1,9 @@
-with open("d23.in") as fp:
-    inp = fp.read()
-if 0:
-    inp = """#.#####################
-#.......#########...###
-#######.#########.#.###
-###.....#.>.>.###.#.###
-###v#####.#v#.###.#.###
-###.>...#.#.#.....#...#
-###v###.#.#.#########.#
-###...#.#.#.......#...#
-#####.#.#.#######.#.###
-#.....#.#.#.......#...#
-#.#####.#.#.#########v#
-#.#...#...#...###...>.#
-#.#.#v#######v###.###v#
-#...#.>.#...>.>.#.###.#
-#####v#.#.###v#.#.###.#
-#.....#...#...#.#.#...#
-#.#########.###.#.#.###
-#...###...#...#...#.###
-###.###.#.###v#####v###
-#...#...#.#.>.>.#.>.###
-#.###.###.#.###.#.#v###
-#.....###...###...#...#
-#####################.#
-"""
+from aoc import cmat
 p2 = True
 
-rows = inp.strip().splitlines()
 start = complex(1, 0)
-goal = complex(len(rows[0]) - 2, len(rows) - 1)
-
-def read(pos: complex) -> str:
-    return rows[int(pos.imag)][int(pos.real)]
+n, m = cmat.shape
+goal = complex(m - 2, n - 1)
 
 def neighbors(pos: complex) -> list[tuple[complex, bool, bool]]:
     if pos == start:
@@ -40,9 +11,9 @@ def neighbors(pos: complex) -> list[tuple[complex, bool, bool]]:
     if pos == goal:
         return [(pos - 1j, False, False)]
     n = []
-    oneway = {">": 1, "<": -1, "v": 1j, "^": -1j}.get(read(pos))
+    oneway = {">": 1, "<": -1, "v": 1j, "^": -1j}.get(cmat.read(pos))
     for d in (1, -1, 1j, -1j):
-        if read(pos + d) == "#":
+        if cmat.read(pos + d) == "#":
             continue
         n.append((pos + d, oneway == d, oneway == -d))
     return n
@@ -75,7 +46,7 @@ while i < len(vertices):
                 continue
             dist[n] = d + 1
             if outbound:
-                assert o != -1, (pos, read(pos), n, read(n))
+                assert o != -1, (pos, cmat.read(pos), n, cmat.read(n))
                 oneway[n] = 1
             elif inbound:
                 assert o != 1

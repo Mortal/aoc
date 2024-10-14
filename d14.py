@@ -1,29 +1,14 @@
-with open("d14.in") as fp:
-    inp = fp.read()
-if 0:
-    inp = """O....#....
-O.OO#....#
-.....##...
-OO.#O....O
-.O.....O#.
-O.#..O.#.#
-..O..#O..O
-.......O..
-#....###..
-#OO..#....
-"""
-rows = inp.strip().splitlines()
-n = len(rows)
-m = len(rows[0])
+from aoc import mat
+n, m = mat.shape
 
 place = {}
 for j in range(m):
     count = 0
     for i in range(n)[::-1]:
-        if rows[i][j] == "#" and count:
+        if mat[i][j] == "#" and count:
             place[i + 1, j] = count
             count = 0
-        elif rows[i][j] == "O":
+        elif mat[i][j] == "O":
             count += 1
     if count:
         place[0, j] = count
@@ -38,19 +23,19 @@ for j in range(m):
             newrows[i][j] = "O"
             count -= 1
             load += n - i
-        if rows[i][j] == "#":
+        if mat[i][j] == "#":
             newrows[i][j] = "#"
 print("\n".join("".join(row) for row in newrows))
 print(load)
 
 def main() -> None:
-    rowss = [list(row) for row in rows]
+    rowss = [list(row) for row in mat]
     init = "\n".join("".join(row) for row in rowss)
     ocount = sum(c == "O" for row in rowss for c in row)
     assert ocount, ocount
     import time
     t = time.time()
-    totit = 1000000000
+    totit = 1000
     testhash = 0
     stopafter = -1
 
@@ -128,7 +113,7 @@ def main() -> None:
                 if (i, j) in place:
                     count = place[i, j]
                 if count:
-                    assert rowss[i][j] == ".", (i, j, rows[i][j], count)
+                    assert rowss[i][j] == ".", (i, j, mat[i][j], count)
                     rowss[i][j] = "O"
                     count -= 1
                     load += n - i

@@ -1,31 +1,6 @@
-with open("d17.in") as fp:
-    inp = fp.read()
-if 0:
-    inp = """2413432311323
-3215453535623
-3255245654254
-3446585845452
-4546657867536
-1438598798454
-4457876987766
-3637877979653
-4654967986887
-4564679986453
-1224686865563
-2546548887735
-4322674655533
-"""
-if 0:
-    inp = """111111111111
-999999999991
-999999999991
-999999999991
-999999999991
-"""
+from aoc import cmat
 
-rows = [list(map(int, line)) for line in inp.strip().splitlines()]
-n = len(rows)
-m = len(rows[0])
+n, m = cmat.shape
 
 def go(minturn: int, maxturn: int) -> tuple[int, dict[complex, str]]:
     pq = [[(0+0j, 1+0j, 0), (0+0j, 0+1j, 0)]]
@@ -34,11 +9,7 @@ def go(minturn: int, maxturn: int) -> tuple[int, dict[complex, str]]:
     src = {s: s for s in pq[0]}
 
     def read(pos: complex) -> int:
-        row = int(pos.imag)
-        col = int(pos.real)
-        if 0 <= row < len(rows) and 0 <= col < len(rows[row]):
-            return rows[row][col]
-        return -1
+        return int(cmat.read(pos) or "-1")
 
     def backtrace(state: tuple[complex, complex, int]) -> dict[complex, str]:
         bt = [state]
@@ -81,9 +52,9 @@ def go(minturn: int, maxturn: int) -> tuple[int, dict[complex, str]]:
     raise
 
 d, bt = go(0, 3)
-print("\n".join("".join(bt.get(complex(j, i), str(rows[i][j])) for j in range(m)) for i in range(n)))
+print("\n".join("".join(bt.get(complex(j, i), str(cmat[i][j])) for j in range(m)) for i in range(n)))
 print(d)
 
 d, bt = go(4, 10)
-print("\n".join("".join(bt.get(complex(j, i), str(rows[i][j])) for j in range(m)) for i in range(n)))
+print("\n".join("".join(bt.get(complex(j, i), str(cmat[i][j])) for j in range(m)) for i in range(n)))
 print(d)

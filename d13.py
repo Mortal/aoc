@@ -1,22 +1,4 @@
-with open("d13.in") as fp:
-    inp = fp.read()
-if 0:
-    inp = """#.##..##.
-..#.##.#.
-##......#
-##......#
-..#.##.#.
-..##..##.
-#.#.##.#.
-
-#...##..#
-#....#..#
-..##..###
-#####.##.
-#####.##.
-..##..###
-#....#..#
-"""
+from aoc import inp
 
 def isreflection(rows: list[str], i: int) -> bool:
     smudge = False
