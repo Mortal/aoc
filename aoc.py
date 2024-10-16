@@ -2,6 +2,7 @@ import argparse
 import types
 import datetime
 import subprocess
+import traceback
 import importlib.abc
 import importlib.util
 import os
@@ -23,12 +24,23 @@ mat: "TupleStringMatrix"
 cmat: "ComplexStringMatrix"
 
 
-def _aoc_run(args: Any, loader: importlib.abc.Loader, module: types.ModuleType, path_: str) -> None:
+def _aoc_run(args: Any, loader: importlib.abc.Loader, module: types.ModuleType, path_: str, quit_on_empty: bool = False) -> None:
     global path, inp, lines, mat, cmat
     path = path_
-    print(f"=============> {path} <=============")
-    with open(path_) as fp:
-        inp = fp.read()
+    if path == "-":
+        try:
+            inp = sys.stdin.read()
+        except (KeyboardInterrupt, EOFError):
+            if quit_on_empty:
+                print("\nBye!")
+                raise SystemExit
+            raise
+    else:
+        print(f"=============> {path} <=============")
+        with open(path_) as fp:
+            inp = fp.read()
+    if quit_on_empty and not inp:
+        raise SystemExit
     lines = inp.strip().splitlines()
     mat = TupleStringMatrix(lines)
     cmat = ComplexStringMatrix(lines)
@@ -42,6 +54,9 @@ def _aoc_run(args: Any, loader: importlib.abc.Loader, module: types.ModuleType, 
         qprint = print
     try:
         loader.exec_module(module)
+    except Exception:
+        emit_last_print_if_quiet()
+        traceback.print_exc()
     except SystemExit as e:
         if e.args:
             if isinstance(e.args[0], int):
@@ -54,7 +69,8 @@ def _aoc_run(args: Any, loader: importlib.abc.Loader, module: types.ModuleType, 
             elif e.args[0] is not None:
                 # exit('msg') -> print('msg', file=sys.stderr) and exit with code 1
                 qprint(e.args[0], file=sys.stderr)
-    emit_last_print_if_quiet()
+    else:
+        emit_last_print_if_quiet()
 
 
 class Bfs:
@@ -193,6 +209,8 @@ class InputScanner:
         return [path for (sz, path) in sorted(inputfiles)]
 
     def path(self, kind: str) -> str:
+        if kind == "-":
+            return "/dev/stdin"
         return os.path.join(self.inputdir, f"{self.prefix}{kind}{self.suffix}")
 
     def has(self, kind: str) -> bool:
@@ -216,7 +234,9 @@ def _aoc_main() -> None:
     args = _parser.parse_args()
     paste: bool = args.paste
     which: str | None = args.which
-    if paste or not input_scanner.has(which or "test"):
+    stdin_tty = os.isatty(0)
+    from_stdin = which == "-" or (not paste and not which and not stdin_tty)
+    if paste or not from_stdin and not input_scanner.has(which or "test"):
         if which is None:
             print("Guessing paste kind from your clipboard metadata...")
             types = subprocess.check_output(("wl-paste", "-l")).decode().split()
@@ -271,9 +291,18 @@ def _aoc_main() -> None:
             with open(path, "xb") as ofp:
                 ofp.write(contents)
 
-    files = [input_scanner.path(args.which)] if args.which else input_scanner.scan()
-    for path in files:
-        _aoc_run(args, spec.loader, module, path)
+    if from_stdin:
+        if stdin_tty:
+            print("Paste input data, end with CTRL-D")
+        _aoc_run(args, spec.loader, module, "-")
+        if stdin_tty:
+            while True:
+                print("Done! Hope it went well. Anyway, you can paste another round of input data and press CTRL-D if you want. Or press CTRL-D or CTRL-C to exit right away.")
+                _aoc_run(args, spec.loader, module, "-", quit_on_empty=True)
+    else:
+        files = [input_scanner.path(args.which)] if args.which else input_scanner.scan()
+        for path in files:
+            _aoc_run(args, spec.loader, module, path)
 
 
 _aoc_main()
