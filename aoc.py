@@ -216,6 +216,9 @@ class InputScanner:
     def has(self, kind: str) -> bool:
         return os.path.exists(self.path(kind))
 
+    def makedirs(self) -> None:
+        os.makedirs(self.inputdir, exist_ok=True)
+
 
 def _aoc_main() -> None:
     mainfile = sys.modules["__main__"].__file__
@@ -288,6 +291,7 @@ def _aoc_main() -> None:
         else:
             contents = f"{thetext}\n".encode()
             print(f"Storing clipboard contents as {path}...")
+            input_scanner.makedirs()
             with open(path, "xb") as ofp:
                 ofp.write(contents)
 
