@@ -20,15 +20,18 @@ _parser.add_argument("which", nargs="?", help="Which input to run/paste (e.g. 's
 path: str
 inp: str
 lines: list[str]
+toks: list[Any]
 ints: list[int]
 linetoks: list[list[Any]]
 lineints: list[list[int]]
+sectiontoks: list[list[list[Any]]]
+sectionints: list[list[list[int]]]
 mat: "TupleStringMatrix"
 cmat: "ComplexStringMatrix"
 
 
 def _aoc_run(args: Any, loader: importlib.abc.Loader, module: types.ModuleType, path_: str, quit_on_empty: bool = False) -> None:
-    global path, inp, lines, ints, linetoks, lineints, mat, cmat
+    global path, inp, lines, toks, ints, linetoks, lineints, sectiontoks, sectionints, mat, cmat
     path = path_
     if path == "-":
         try:
@@ -45,14 +48,20 @@ def _aoc_run(args: Any, loader: importlib.abc.Loader, module: types.ModuleType, 
     if quit_on_empty and not inp:
         raise SystemExit
     lines = inp.strip().splitlines()
-    linetoks = [
+    sectiontoks = [
         [
-            int(w) if w[0] in "0123456789" else w
-            for w in re.findall("[a-z]+|[0-9]+", line)
+            [
+                int(w) if w[0] in "0123456789" else w
+                for w in re.findall("[a-z]+|[0-9]+", line)
+            ]
+            for line in section.splitlines()
         ]
-        for line in lines
+        for section in inp.strip().split("\n\n")
     ]
-    lineints = [[i for i in line if isinstance(i, line)] for line in linetoks]
+    sectionints = [[[i for i in line if isinstance(i, int)] for line in section] for section in sectiontoks]
+    linetoks = [line for section in sectiontoks for line in section]
+    lineints = [[i for i in line if isinstance(i, int)] for line in linetoks]
+    toks = [x for line in linetoks for x in line]
     ints = [i for line in lineints for i in line]
     mat = TupleStringMatrix(lines)
     cmat = ComplexStringMatrix(lines)

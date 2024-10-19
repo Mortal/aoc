@@ -1,13 +1,9 @@
-from aoc import linetoks, path
+from aoc import lineints, path
 from collections import Counter
 
 count = Counter[tuple[int,int]]()
 
-for x1,y1,x2,y2 in linetoks:
-    assert isinstance(x1, int), (x1,y1,x2,y2)
-    assert isinstance(x2, int), (x1,y1,x2,y2)
-    assert isinstance(y1, int), (x1,y1,x2,y2)
-    assert isinstance(y2, int), (x1,y1,x2,y2)
+for x1,y1,x2,y2 in lineints:
     for x in range(min(x1,x2),max(x1,x2)+1):
         if x1 == x2 or y1 == y2:
             ya = min(y1,y2)

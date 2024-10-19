@@ -1,15 +1,14 @@
-from aoc import inp
+from aoc import sectionints
 
-nums_str, *boards_str = inp.split("\n\n")
-nums = list(map(int, nums_str.split(",")))
+(nums,), *boards = sectionints
 
-boards = []
-for b in boards_str:
-    rows = [[nums.index(n) for n in list(map(int, line.split()))] for line in b.splitlines()]
+result = []
+for rows in boards:
+    rows = [[nums.index(n) for n in row] for row in rows]
     columns = list(zip(*rows))
     when = min(*[max(r) for r in rows + columns])
     unmarked = sum(nums[i] for row in rows for i in row if i > when)
     score = unmarked * nums[when]
-    boards.append((when, score))
-print(min(boards))
-print(max(boards))
+    result.append((when, score))
+print(min(result))
+print(max(result))
