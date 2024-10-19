@@ -1,10 +1,8 @@
-from aoc import lines
+from aoc import linetoks
 
 pos = 0
 depth = 0
-for line in lines:
-    cmd, n_str = line.split()
-    n = int(n_str)
+for cmd, n in linetoks:
     if cmd == "forward":
         pos += n
     elif cmd == "down":
@@ -16,9 +14,7 @@ print(pos*depth)
 pos = 0
 depth = 0
 aim = 0
-for line in lines:
-    cmd, n_str = line.split()
-    n = int(n_str)
+for cmd, n in linetoks:
     if cmd == "forward":
         pos += n
         depth -= aim * n
