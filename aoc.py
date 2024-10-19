@@ -20,13 +20,15 @@ _parser.add_argument("which", nargs="?", help="Which input to run/paste (e.g. 's
 path: str
 inp: str
 lines: list[str]
+ints: list[int]
 linetoks: list[list[Any]]
+lineints: list[list[int]]
 mat: "TupleStringMatrix"
 cmat: "ComplexStringMatrix"
 
 
 def _aoc_run(args: Any, loader: importlib.abc.Loader, module: types.ModuleType, path_: str, quit_on_empty: bool = False) -> None:
-    global path, inp, lines, linetoks, mat, cmat
+    global path, inp, lines, ints, linetoks, lineints, mat, cmat
     path = path_
     if path == "-":
         try:
@@ -50,6 +52,8 @@ def _aoc_run(args: Any, loader: importlib.abc.Loader, module: types.ModuleType, 
         ]
         for line in lines
     ]
+    lineints = [[i for i in line if isinstance(i, line)] for line in linetoks]
+    ints = [i for line in lineints for i in line]
     mat = TupleStringMatrix(lines)
     cmat = ComplexStringMatrix(lines)
     emit_last_print_if_quiet = lambda: None
