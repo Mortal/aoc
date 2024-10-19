@@ -249,13 +249,14 @@ def _aoc_main() -> None:
     from_stdin = which == "-" or (not paste and not which and not stdin_tty)
     if paste or not from_stdin and not input_scanner.has(which or "test"):
         if which is None:
+            files = [input_scanner.path(args.which)] if args.which else input_scanner.scan()
             print("Guessing paste kind from your clipboard metadata...")
             types = subprocess.check_output(("wl-paste", "-l")).decode().split()
             if "text/x-moz-url-priv" in types:
                 url = subprocess.check_output(("wl-paste", "-t", "text/x-moz-url-priv")).decode().strip().replace("\0", "")
             elif "chromium/x-source-url" in types:
                 url = subprocess.check_output(("wl-paste", "-t", "chromium/x-source-url")).decode().strip()
-            else:
+            elif paste or not files:
                 cwdyears = re.findall("20[0-2][0-9]", os.getcwd())
                 if cwdyears:
                     # There's a year in the path of the cwd, so use that.
@@ -266,32 +267,35 @@ def _aoc_main() -> None:
                     theyear = today.year
                 theday = day or today.day
                 raise SystemExit(f"Please copy the sample data from https://adventofcode.com/{theyear}/day/{theday} or the test data from https://adventofcode.com/{theyear}/day/{theday}/input")
+            else:
+                url = ""
             urlinputmo = re.fullmatch(r'^https://adventofcode\.com/(\d+)/day/(\d+)(/input)?$', url)
-            if not urlinputmo:
+            if urlinputmo:
+                urlyear = int(urlinputmo.group(1))
+                urlday = int(urlinputmo.group(2))
+                isinput = urlinputmo.group(3) or ""
+
+                if day and urlday != day:
+                    raise SystemExit(f"You have copied the input for the wrong day: {url} - you are running the code for day {day}, so you should copy from https://adventofcode.com/{urlyear}/day/{day}{isinput}")
+
+                print(f"Getting data from clipboard...")
+                thetext = subprocess.check_output(("wl-paste",)).decode().strip()
+                assert thetext
+
+                if isinput:
+                    which = "test"
+                else:
+                    which = "samp"
+                    i = 1
+                    while input_scanner.has(which):
+                        with open(input_scanner.path(which)) as fp:
+                            if fp.read().strip() == thetext:
+                                break
+                        i += 1
+                        which = f"samp{i}"
+            elif paste or not files:
                 raise SystemExit(f"You appear to have copied some data from an unknown URL: {url!r}\n\nPlease copy the sample data directly from the AOC website, or copy the test data and run with -p samp or -p test")
 
-            urlyear = int(urlinputmo.group(1))
-            urlday = int(urlinputmo.group(2))
-            isinput = urlinputmo.group(3) or ""
-
-            if day and urlday != day:
-                raise SystemExit(f"You have copied the input for the wrong day: {url} - you are running the code for day {day}, so you should copy from https://adventofcode.com/{urlyear}/day/{day}{isinput}")
-
-            print(f"Getting data from clipboard...")
-            thetext = subprocess.check_output(("wl-paste",)).decode().strip()
-            assert thetext
-
-            if isinput:
-                which = "test"
-            else:
-                which = "samp"
-                i = 1
-                while input_scanner.has(which):
-                    with open(input_scanner.path(which)) as fp:
-                        if fp.read().strip() == thetext:
-                            break
-                    i += 1
-                    which = f"samp{i}"
         else:
             if input_scanner.has(which):
                 raise SystemExit(f"Please delete {input_scanner.path(which)} and try again")
@@ -299,15 +303,18 @@ def _aoc_main() -> None:
             thetext = subprocess.check_output(("wl-paste",)).decode().strip()
             assert thetext
 
-        path = input_scanner.path(which)
-        if input_scanner.has(which):
-            print(f"Input {which!r} already exists at {path}")
+        if which is None:
+            print("Unknown text pasted - continuing with previous sample input data")
         else:
-            contents = f"{thetext}\n".encode()
-            print(f"Storing clipboard contents as {path}...")
-            input_scanner.makedirs()
-            with open(path, "xb") as ofp:
-                ofp.write(contents)
+            path = input_scanner.path(which)
+            if input_scanner.has(which):
+                print(f"Input {which!r} already exists at {path}")
+            else:
+                contents = f"{thetext}\n".encode()
+                print(f"Storing clipboard contents as {path}...")
+                input_scanner.makedirs()
+                with open(path, "xb") as ofp:
+                    ofp.write(contents)
 
     if from_stdin:
         if stdin_tty:
