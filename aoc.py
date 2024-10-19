@@ -248,10 +248,16 @@ def _aoc_main() -> None:
             elif "chromium/x-source-url" in types:
                 url = subprocess.check_output(("wl-paste", "-t", "chromium/x-source-url")).decode().strip()
             else:
-                today = datetime.date.today()
-                theyear = today.year
+                cwdyears = re.findall("20[0-2][0-9]", os.getcwd())
+                if cwdyears:
+                    # There's a year in the path of the cwd, so use that.
+                    theyear = int(cwdyears[-1])
+                else:
+                    # Fall back on today's year.
+                    today = datetime.date.today()
+                    theyear = today.year
                 theday = day or today.day
-                raise SystemExit(f"Please copy the sample data from https://adventofcode.com/{theyear}/day/{theday}")
+                raise SystemExit(f"Please copy the sample data from https://adventofcode.com/{theyear}/day/{theday} or the test data from https://adventofcode.com/{theyear}/day/{theday}/input")
             urlinputmo = re.fullmatch(r'^https://adventofcode\.com/(\d+)/day/(\d+)(/input)?$', url)
             if not urlinputmo:
                 raise SystemExit(f"You appear to have copied some data from an unknown URL: {url!r}\n\nPlease copy the sample data directly from the AOC website, or copy the test data and run with -p samp or -p test")
