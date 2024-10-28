@@ -101,16 +101,16 @@ def _aoc_run(args: Any, loader: importlib.abc.Loader, module: types.ModuleType, 
 
 
 class Bfs:
-    def __init__(self, lines: list[str]) -> None:
+    def __init__(self, lines: list[str] | list[list[str]]) -> None:
         self._lines = lines
 
     def __call__(self, inits: list[tuple[int, int]] | tuple[int, int] | dict[tuple[int, int], int]) -> "Bfs":
         if isinstance(inits, list):
-            self._bfs = inits
+            self._bfs = [*inits]
             self.dist = {s: 0 for s in inits}
             self.parent = {s: s for s in inits}
         elif isinstance(inits, dict):
-            self.dist = inits
+            self.dist = {**inits}
             self._bfs = list(inits)
             self.parent = {s: s for s in inits}
         else:
@@ -145,18 +145,23 @@ class Bfs:
 
 class TupleStringMatrix:
     def __init__(self, lines: list[str]) -> None:
-        self._lines = lines
+        self._lines = [list(line) for line in lines]
         self.shape = len(lines), len(lines[0])
         self.bfs = Bfs(self._lines)
 
     def __len__(self) -> int:
         return len(self._lines)
 
-    def __getitem__(self, i: int) -> str:
+    def __getitem__(self, i: int) -> list[str]:
         return self._lines[i]
 
-    def __iter__(self) -> Iterator[str]:
+    def __iter__(self) -> Iterator[list[str]]:
         return iter(self._lines)
+
+    def keys(self) -> list[tuple[int, int]]:
+        return [
+            (i, j) for i, row in enumerate(lines) for j in range(len(row))
+        ]
 
     def findall(self, ch: str) -> list[tuple[int, int]]:
         assert len(ch) == 1
