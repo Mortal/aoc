@@ -1,14 +1,4 @@
-# import utils
-import re
-from math import ceil
-
-SAMPLE = False
-# inp = utils.get_input(day=19).strip()
-with open("d19.txt") as fp:
-    inp = fp.read().strip()
-if SAMPLE:
-    inp = """Blueprint 1: Each ore robot costs 4 ore. Each clay robot costs 2 ore. Each obsidian robot costs 3 ore and 14 clay. Each geode robot costs 2 ore and 7 obsidian.
-Blueprint 2: Each ore robot costs 2 ore. Each clay robot costs 3 ore. Each obsidian robot costs 3 ore and 8 clay. Each geode robot costs 3 ore and 12 obsidian."""
+from aoc import lineints, ceil
 
 
 def step(costs, resources=(0, 0, 0), dr=(1, 0, 0), timeleft=24):
@@ -61,9 +51,7 @@ def step(costs, resources=(0, 0, 0), dr=(1, 0, 0), timeleft=24):
     return score
 
 t = 0
-for bp in inp.split("\n"):
-    vals = re.findall(r"\d+", bp)
-    bpid, oro, clo, obo, obc, gor, gob = map(int, vals)
+for bpid, oro, clo, obo, obc, gor, gob in lineints:
     costs = (oro, clo, obo, obc, gor, gob)
     MEMO = {}
     score = step(costs)
@@ -72,9 +60,7 @@ for bp in inp.split("\n"):
 print("Part 1:", t)
 
 t = 1
-for bp in inp.split("\n")[0:3]:
-    vals = re.findall(r"\d+", bp)
-    bpid, oro, clo, obo, obc, gor, gob = map(int, vals)
+for bpid, oro, clo, obo, obc, gor, gob in lineints[0:3]:
     costs = (oro, clo, obo, obc, gor, gob)
     MEMO = {}
     score = step(costs, timeleft=32)

@@ -1,9 +1,23 @@
+from aoc import sectionlines, path
 import re
 
-with open("d22.txt") as fp:
-    themap_str, directions = fp.read().strip("\n").split("\n\n")
+themap, (directions,) = sectionlines
 
-corners = """
+if "samp" in path:
+    corners = """
+    AB
+    CD
+BAACCD
+FGGHHE
+    HEED
+    GFFB
+""".strip(
+        "\n"
+    ).split(
+        "\n"
+    )
+else:
+    corners = """
   GHHD
   FBBA
   FB
@@ -18,43 +32,6 @@ HD
     "\n"
 )
 
-if 0:
-    corners = """
-    AB
-    CD
-BAACCD
-FGGHHE
-    HEED
-    GFFB
-""".strip(
-        "\n"
-    ).split(
-        "\n"
-    )
-    (
-        themap_str,
-        directions,
-    ) = """
-        ...#
-        .#..
-        #...
-        ....
-...#.......#
-........#...
-..#....#....
-..........#.
-        ...#....
-        .....#..
-        .#......
-        ......#.
-
-10R5L5R10L4R5L5
-""".strip(
-        "\n"
-    ).split(
-        "\n\n"
-    )
-themap = themap_str.split("\n")
 topleft = next(
     (i, j) for i, line in enumerate(themap) for j, v in enumerate(line) if v != " "
 )

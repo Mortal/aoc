@@ -9,6 +9,7 @@ import os
 import re
 import sys
 from typing import Any, Iterator
+from math import ceil, gcd  # type: ignore[import]
 
 
 _parser = argparse.ArgumentParser()
@@ -24,6 +25,7 @@ toks: list[Any]
 ints: list[int]
 linetoks: list[list[Any]]
 lineints: list[list[int]]
+sectionlines: list[list[str]]
 sectiontoks: list[list[list[Any]]]
 sectionints: list[list[list[int]]]
 mat: "TupleStringMatrix"
@@ -31,7 +33,7 @@ cmat: "ComplexStringMatrix"
 
 
 def _aoc_run(args: Any, loader: importlib.abc.Loader, module: types.ModuleType, path_: str, quit_on_empty: bool = False) -> None:
-    global path, inp, lines, toks, ints, linetoks, lineints, sectiontoks, sectionints, mat, cmat
+    global path, inp, lines, toks, ints, linetoks, lineints, sectionlines, sectiontoks, sectionints, mat, cmat
     path = path_
     if path == "-":
         try:
@@ -47,16 +49,20 @@ def _aoc_run(args: Any, loader: importlib.abc.Loader, module: types.ModuleType, 
             inp = fp.read()
     if quit_on_empty and not inp:
         raise SystemExit
-    lines = inp.strip().splitlines()
+    lines = inp.strip("\n").splitlines()
+    sectionlines = [
+        section.splitlines()
+        for section in inp.strip("\n").split("\n\n")
+    ]
     sectiontoks = [
         [
             [
-                int(w) if w[0] in "0123456789" else w
-                for w in re.findall("[a-z]+|[0-9]+", line)
+                int(w) if w[-1] in "0123456789" else w
+                for w in re.findall("[^0-9 ,;-][^0-9 ,;]*|-?[0-9]+", line)
             ]
-            for line in section.splitlines()
+            for line in lines
         ]
-        for section in inp.strip().split("\n\n")
+        for lines in sectionlines
     ]
     sectionints = [[[i for i in line if isinstance(i, int)] for line in section] for section in sectiontoks]
     linetoks = [line for section in sectiontoks for line in section]
@@ -221,7 +227,11 @@ class InputScanner:
 
     def scan(self) -> list[str]:
         inputfiles: list[tuple[int, str]] = []
-        for f in os.listdir(self.inputdir):
+        try:
+            contents = os.listdir(self.inputdir)
+        except FileNotFoundError:
+            contents = []
+        for f in contents:
             kind = f.removeprefix(self.prefix).removesuffix(self.suffix)
             if f == f"{self.prefix}{kind}{self.suffix}":
                 path = self.path(kind)
@@ -246,8 +256,9 @@ def _aoc_main() -> None:
     assert mainfile
     basename = os.path.basename(mainfile).removesuffix(".py")
     assert re.fullmatch(r'^[a-z_][a-z_0-9]*$', basename)
-    daymo = re.search(r'[0-9]+', basename)
-    day = int(daymo.group()) if daymo else None
+    daymo = re.findall(r'[0-9]+', basename)
+    years = [y for y in daymo if len(y) == 4]
+    day = next(int(d) for d in daymo if len(d) < 3) if daymo else None
     spec = importlib.util.spec_from_file_location("_aocmain", mainfile)
     assert spec is not None
     module = importlib.util.module_from_spec(spec)
@@ -266,14 +277,16 @@ def _aoc_main() -> None:
             print("Guessing paste kind from your clipboard metadata...")
             types = subprocess.check_output(("wl-paste", "-l")).decode().split()
             if "text/x-moz-url-priv" in types:
-                url = subprocess.check_output(("wl-paste", "-t", "text/x-moz-url-priv")).decode().strip().replace("\0", "")
+                url = subprocess.check_output(("wl-paste", "-t", "text/x-moz-url-priv")).decode().strip("\n").replace("\0", "")
             elif "chromium/x-source-url" in types:
-                url = subprocess.check_output(("wl-paste", "-t", "chromium/x-source-url")).decode().strip()
+                url = subprocess.check_output(("wl-paste", "-t", "chromium/x-source-url")).decode().strip("\n")
             elif paste or not files:
                 cwdyears = re.findall("20[0-2][0-9]", os.getcwd())
                 if cwdyears:
                     # There's a year in the path of the cwd, so use that.
-                    theyear = int(cwdyears[-1])
+                    theyear: int | None = int(cwdyears[-1])
+                elif years:
+                    theyear = int(years[0])
                 else:
                     # Fall back on today's year.
                     today = datetime.date.today()
@@ -288,11 +301,21 @@ def _aoc_main() -> None:
                 urlday = int(urlinputmo.group(2))
                 isinput = urlinputmo.group(3) or ""
 
+                cwdyears = re.findall("20[0-2][0-9]", os.getcwd())
+                if cwdyears:
+                    # There's a year in the path of the cwd, so use that.
+                    theyear = int(cwdyears[-1])
+                elif years:
+                    theyear = int(years[0])
+                else:
+                    theyear = None
+                if theyear and theyear != urlyear:
+                    raise SystemExit(f"You have copied the input for the wrong year: {url} - you are running the code for year {theyear}, so you should copy from https://adventofcode.com/{theyear}/day/{day or urlday}{isinput}")
                 if day and urlday != day:
                     raise SystemExit(f"You have copied the input for the wrong day: {url} - you are running the code for day {day}, so you should copy from https://adventofcode.com/{urlyear}/day/{day}{isinput}")
 
                 print(f"Getting data from clipboard...")
-                thetext = subprocess.check_output(("wl-paste",)).decode().strip()
+                thetext = subprocess.check_output(("wl-paste",)).decode().strip("\n")
                 assert thetext
 
                 if isinput:
@@ -302,7 +325,7 @@ def _aoc_main() -> None:
                     i = 1
                     while input_scanner.has(which):
                         with open(input_scanner.path(which)) as fp:
-                            if fp.read().strip() == thetext:
+                            if fp.read().strip("\n") == thetext:
                                 break
                         i += 1
                         which = f"samp{i}"
@@ -313,7 +336,7 @@ def _aoc_main() -> None:
             if input_scanner.has(which):
                 raise SystemExit(f"Please delete {input_scanner.path(which)} and try again")
             print(f"Getting input {which!r} from clipboard...")
-            thetext = subprocess.check_output(("wl-paste",)).decode().strip()
+            thetext = subprocess.check_output(("wl-paste",)).decode().strip("\n")
             assert thetext
 
         if which is None:

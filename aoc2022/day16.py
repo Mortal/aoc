@@ -1,13 +1,14 @@
-import re
+from aoc import linetoks
 
 edgelists: dict[str, list[str]] = {}
 flowrates: dict[str, int] = {}
 
-with open("day16.txt") as fp:
-    for line in fp:
-        name, flowrate, *edges = re.findall(r"[A-Z]{2}|\d+", line)
-        edgelists[name] = edges
-        flowrates[name] = int(flowrate)
+for line in linetoks:
+    name = line[1]
+    flowrate = line[5]
+    edges = line[10:]
+    edgelists[name] = edges
+    flowrates[name] = int(flowrate)
 
 dp1: list[dict[frozenset[str], dict[str, int]]] = [{} for _ in range(31)]
 dp1[0][frozenset()] = {"AA": 0}

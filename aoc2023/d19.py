@@ -1,15 +1,15 @@
-from aoc import inp
+from aoc import sectionlines
 import re
 
-transitions_str, states_str = inp.strip().split("\n\n")
+transitions_str, states_str = sectionlines
 transitions = {
         k: v
-        for line in transitions_str.splitlines()
+        for line in transitions_str
         for k, *v in [re.findall(r'[A-Za-z0-9]+|[<>]', line)]
         }
 
 thesum = 0
-for line in states_str.splitlines():
+for line in states_str:
     vals1 = list(map(int, re.findall(r'[0-9]+', line)))
     state = "in"
     while state in transitions:

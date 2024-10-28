@@ -1,8 +1,7 @@
-from aoc import inp, path
+from aoc import ints, path
 from collections import Counter
 
-nums = list(map(int, inp.split(",")))
-counts = Counter(nums)
+counts = Counter(ints)
 state = [counts[i] for i in range(7)]
 b7 = counts[7]
 b8 = counts[8]

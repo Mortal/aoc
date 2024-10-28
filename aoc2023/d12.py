@@ -1,13 +1,13 @@
-from aoc import lines
+from aoc import linetoks
 
 def patterns_endswith(chars: str, pattern: str, i: int, j: int) -> bool:
     assert 0 <= i <= j <= len(chars)
     return j - i >= len(pattern) and all(chars[j - k] in ("?", pattern[-k]) for k in range(1, len(pattern) + 1))
 
 totalsum = 0
-for line in lines:
-    chars, nums_str = line.split()
-    nums = list(map(int, nums_str.split(",")))
+chars: str
+nums: list[int]
+for chars, *nums in linetoks:
     chars = "?".join([chars]*5)
     nums = nums * 5
     dp: list[list[int]] = []
@@ -29,6 +29,7 @@ for line in lines:
                     dp[i].append(0)
             else:
                 num = nums[j - 1]
+                assert isinstance(num, int), num
                 dp[i].append(
                     sum(
                         dp[k][j - 1]
@@ -41,6 +42,6 @@ for line in lines:
         for i in range(len(dp))
         if patterns_endswith(chars, "." * (len(chars) - i), 0, len(chars))
     )
-    print(chars, nums_str, ans)
+    print(chars, nums, ans)
     totalsum += ans
 print(totalsum)

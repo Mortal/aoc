@@ -1,16 +1,13 @@
-from aoc import lines
+from aoc import lineints, path
 xs: list[range] = []
 ys: list[range] = []
 z1: list[int] = []
 z2: list[int] = []
 bricks: dict[tuple[int, int], list[int]] = {}
 
-for i, line in enumerate(lines):
-    p,q = line.split("~")
-    a,b,c = map(int, p.split(","))
-    x,y,z = map(int, q.split(","))
+for i, (a,b,c,x,y,z) in enumerate(lineints):
     dims = {a-x,b-y,c-z}
-    assert dims == {0} or len(dims) == 2 and 0 in dims, (line, dims)
+    assert dims == {0} or len(dims) == 2 and 0 in dims, (a,b,c,x,y,z, dims)
     xs.append(range(min(a,x), max(a,x)+1))
     ys.append(range(min(b,y), max(b,y)+1))
     z1.append(min(c,z))
@@ -86,5 +83,5 @@ for i in range(n):
 # assert ans == 517
 print(ans)
 # ans2 = sum(sum(len(below2[j]) == 1 for j in above2[i]) for i in range(n))
-assert ans2 > 1978, ans2
+assert "samp" in path or ans2 > 1978, ans2
 print(ans2)

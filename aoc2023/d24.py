@@ -1,4 +1,4 @@
-from aoc import inp, path
+from aoc import lineints, path
 if "test" in path:
     xmin = 200000000000000
     xmax = 400000000000000
@@ -6,8 +6,7 @@ else:
     xmin = 7
     xmax = 27
 hail2d = []
-for line in inp.strip().splitlines():
-    px,py,pz,vx,vy,vz = map(int, line.replace(",", " ").replace("@"," ").split())
+for px,py,pz,vx,vy,vz in lineints:
     # assert xmin <= px <= xmax, px
     assert vx != 0
     assert vy != 0

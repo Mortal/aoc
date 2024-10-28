@@ -1,3 +1,2 @@
-with open("aoc2022d1.txt") as fp:
-    inputs = fp.read().split("\n\n")
-print(sum(sorted(sum(map(int, s.split())) for s in inputs)[-3:]))
+from aoc import sectionints
+print(sum(sorted(sum(map(sum, section)) for section in sectionints)[-3:]))
