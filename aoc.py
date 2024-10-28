@@ -58,7 +58,7 @@ def _aoc_run(args: Any, loader: importlib.abc.Loader, module: types.ModuleType, 
         [
             [
                 int(w) if w[-1] in "0123456789" else w
-                for w in re.findall("[^0-9 ,;-][^0-9 ,;]*|-?[0-9]+", line)
+                for w in re.findall("([^0-9 ,;-][^0-9 ,;]*|-?[0-9]+)-?", line)
             ]
             for line in lines
         ]
@@ -225,6 +225,10 @@ class InputScanner:
     def __init__(self, basename: str) -> None:
         self.prefix = f"{basename}-"
 
+    @property
+    def help_pattern(self) -> str:
+        return f"{self.inputdir}/{self.prefix}*{self.suffix}"
+
     def scan(self) -> list[str]:
         inputfiles: list[tuple[int, str]] = []
         try:
@@ -292,7 +296,18 @@ def _aoc_main() -> None:
                     today = datetime.date.today()
                     theyear = today.year
                 theday = day or today.day
-                raise SystemExit(f"Please copy the sample data from https://adventofcode.com/{theyear}/day/{theday} or the test data from https://adventofcode.com/{theyear}/day/{theday}/input")
+                runbase = f"{os.path.basename(sys.executable)} {sys.argv[0]}"
+                raise SystemExit(
+                    "It does not seem like you have copied Advent of Code input in your web browser.\n\n"
+                    f"Please copy the sample data from https://adventofcode.com/{theyear}/day/{theday}\n"
+                    f"or the test data from https://adventofcode.com/{theyear}/day/{theday}/input\n\n"
+                    "usage:\n\n"
+                    f"  {runbase}         to run on AoC input copied from your web browser\n"
+                    f"  {runbase} -       to run on input from stdin\n"
+                    f"  {runbase} < FILE  to run on input from FILE\n"
+                    f"  {runbase} NAME    to store clipboard contents and run on that input\n\n"
+                    f"Input data will be cached as {input_scanner.help_pattern} for subsequent reuse."
+                )
             else:
                 url = ""
             urlinputmo = re.fullmatch(r'^https://adventofcode\.com/(\d+)/day/(\d+)(/input)?$', url)
