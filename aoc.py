@@ -147,8 +147,14 @@ class Bfs:
 class TupleStringMatrix:
     def __init__(self, lines: list[str]) -> None:
         self._lines = [list(line) for line in lines]
-        self.shape = len(lines), len(lines[0])
         self.bfs = Bfs(self._lines)
+
+    @property
+    def shape(self) -> tuple[int, int]:
+        return len(self._lines), len(self._lines[0])
+
+    def append(self, row: list[str]) -> None:
+        self._lines.append(row)
 
     def __len__(self) -> int:
         return len(self._lines)
