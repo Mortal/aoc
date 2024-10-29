@@ -1,5 +1,4 @@
-from aoc import sectiontoks
-from collections import Counter
+from aoc import sectiontoks, Counter
 
 tpl = sectiontoks[0][0][0]
 rules = {a:c for a, b, c in sectiontoks[1]}

@@ -10,6 +10,7 @@ import re
 import sys
 from typing import Any, Iterator
 from math import ceil, gcd  # type: ignore[import]
+from collections import Counter  # type: ignore[import]
 
 
 _parser = argparse.ArgumentParser()
