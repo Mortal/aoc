@@ -50,7 +50,8 @@ def _aoc_run(args: Any, loader: importlib.abc.Loader, module: types.ModuleType, 
             inp = fp.read()
     if quit_on_empty and not inp:
         raise SystemExit
-    lines = inp.strip("\n").splitlines()
+    inp = inp.strip("\n")
+    lines = inp.splitlines()
     sectionlines = [
         section.splitlines()
         for section in inp.strip("\n").split("\n\n")
@@ -59,7 +60,7 @@ def _aoc_run(args: Any, loader: importlib.abc.Loader, module: types.ModuleType, 
         [
             [
                 int(w) if w[-1] in "0123456789" else w
-                for w in re.findall("([^0-9 ,;-][^0-9 ,;]*|-?[0-9]+)-?", line)
+                for w in re.findall("([^0-9 ,;.=-][^0-9 ,;.=]*|-?[0-9]+)-?", line)
             ]
             for line in lines
         ]
@@ -322,6 +323,7 @@ def _aoc_main() -> None:
                 )
             else:
                 url = ""
+            url = url.split("#")[0]
             urlinputmo = re.fullmatch(r'^https://adventofcode\.com/(\d+)/day/(\d+)(/input)?$', url)
             if urlinputmo:
                 urlyear = int(urlinputmo.group(1))
