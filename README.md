@@ -142,4 +142,4 @@ Run with `-q` to only show the last `print()` statement in your script.
 
 The `from aoc import mat` and `from aoc import cmat` matrices implement a BFS helper.
 
-Whether it's widely useful remains to be seen, but it's used in my solution of 2023-10.
+Whether it's widely useful remains to be seen, but it's used in my solutions of 2023-10, 2021-9 and 2021-11.
