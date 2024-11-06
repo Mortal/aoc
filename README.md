@@ -98,11 +98,19 @@ Run with `-p NAME` to paste another sample input and store it as `inputs/aoc2022
 
 Run with `-q` to only show the last `print()` statement in your script.
 
+Run with `-c` to copy the last output line to the clipboard (using `wl-copy`).
+
 
 ## System requirements
 
+For reading from clipboard (default behavior when run with no arguments):
+
 * GNU/Linux Wayland system with `wl-paste` available to read clipboard contents
 * Firefox or Chromium browser
+
+For writing to clipboard (when `-c` is used):
+
+* GNU/Linux Wayland system with `wl-copy` available to write clipboard contents
 
 
 ## Library

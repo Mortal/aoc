@@ -16,6 +16,7 @@ from collections import Counter  # type: ignore[import]
 _parser = argparse.ArgumentParser()
 _parser.add_argument("-p", "--paste", action="store_true", help="Get input from clipboard")
 _parser.add_argument("-q", "--quiet", action="store_true", help="Only print the last line")
+_parser.add_argument("-c", "--copy", action="store_true", help="Copy last line to clipboard")
 _parser.add_argument("which", nargs="?", help="Which input to run/paste (e.g. 'samp' for sample input or 'test' for the full input")
 
 
@@ -33,7 +34,7 @@ mat: "TupleStringMatrix"
 cmat: "ComplexStringMatrix"
 
 
-def _aoc_run(args: Any, loader: importlib.abc.Loader, module: types.ModuleType, path_: str, quit_on_empty: bool = False) -> None:
+def _aoc_run(cliargs: Any, loader: importlib.abc.Loader, module: types.ModuleType, path_: str, quit_on_empty: bool = False) -> str:
     global path, inp, lines, toks, ints, linetoks, lineints, sectionlines, sectiontoks, sectionints, mat, cmat
     path = path_
     if path == "-":
@@ -74,10 +75,17 @@ def _aoc_run(args: Any, loader: importlib.abc.Loader, module: types.ModuleType, 
     mat = TupleStringMatrix(lines)
     cmat = ComplexStringMatrix(lines)
     emit_last_print_if_quiet = lambda: None
-    if args.quiet:
+    last_line = ""
+    if cliargs.quiet or cliargs.copy:
         def qprint(*args, **kwargs):
-            nonlocal emit_last_print_if_quiet
-            emit_last_print_if_quiet = lambda: print(*args, **kwargs)
+            nonlocal emit_last_print_if_quiet, last_line
+
+            if cliargs.quiet:
+                emit_last_print_if_quiet = lambda: print(*args, **kwargs)
+            else:
+                print(*args, **kwargs)
+            if cliargs.copy and kwargs.get("file") is None:
+                last_line = kwargs.get("sep", " ").join(map(str, args)) + kwargs.get("end", "\n")
         module.__dict__["print"] = qprint
     else:
         qprint = print
@@ -100,6 +108,7 @@ def _aoc_run(args: Any, loader: importlib.abc.Loader, module: types.ModuleType, 
                 qprint(e.args[0], file=sys.stderr)
     else:
         emit_last_print_if_quiet()
+    return last_line.rstrip("\n")
 
 
 class Bfs:
@@ -275,7 +284,8 @@ def _aoc_main() -> None:
     assert re.fullmatch(r'^[a-z_][a-z_0-9]*$', basename)
     daymo = re.findall(r'[0-9]+', basename)
     years = [y for y in daymo if len(y) == 4]
-    day = next(int(d) for d in daymo if len(d) < 3) if daymo else None
+    days = [int(d) for d in daymo if len(d) < 3]
+    day = days[0] if days else None
     spec = importlib.util.spec_from_file_location("_aocmain", mainfile)
     assert spec is not None
     module = importlib.util.module_from_spec(spec)
@@ -283,14 +293,14 @@ def _aoc_main() -> None:
     assert spec.loader is not None
 
     input_scanner = InputScanner(basename)
-    args = _parser.parse_args()
-    paste: bool = args.paste
-    which: str | None = args.which
+    cliargs = _parser.parse_args()
+    paste: bool = cliargs.paste
+    which: str | None = cliargs.which
     stdin_tty = os.isatty(0)
     from_stdin = which == "-" or (not paste and not which and not stdin_tty)
     if paste or not from_stdin and not input_scanner.has(which or "test"):
         if which is None:
-            files = [input_scanner.path(args.which)] if args.which else input_scanner.scan()
+            files = [input_scanner.path(cliargs.which)] if cliargs.which else input_scanner.scan()
             print("Guessing paste kind from your clipboard metadata...")
             types = subprocess.check_output(("wl-paste", "-l")).decode().split()
             if "text/x-moz-url-priv" in types:
@@ -381,18 +391,27 @@ def _aoc_main() -> None:
                 with open(path, "xb") as ofp:
                     ofp.write(contents)
 
+    last_line = ""
     if from_stdin:
         if stdin_tty:
             print("Paste input data, end with CTRL-D")
-        _aoc_run(args, spec.loader, module, "-")
+        last_line = _aoc_run(cliargs, spec.loader, module, "-")
         if stdin_tty:
             while True:
                 print("Done! Hope it went well. Anyway, you can paste another round of input data and press CTRL-D if you want. Or press CTRL-D or CTRL-C to exit right away.")
-                _aoc_run(args, spec.loader, module, "-", quit_on_empty=True)
+                last_line = _aoc_run(cliargs, spec.loader, module, "-", quit_on_empty=True)
     else:
-        files = [input_scanner.path(args.which)] if args.which else input_scanner.scan()
+        if cliargs.which:
+            if "/" in cliargs.which or "." in cliargs.which:
+                files = [cliargs.which]
+            else:
+                files = [input_scanner.path(cliargs.which)]
+        else:
+            files = input_scanner.scan()
         for path in files:
-            _aoc_run(args, spec.loader, module, path)
+            last_line = _aoc_run(cliargs, spec.loader, module, path)
+    if cliargs.copy and last_line:
+        subprocess.run(("wl-copy",), input=last_line.encode())
 
 
 _aoc_main()
