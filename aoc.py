@@ -227,7 +227,7 @@ class ComplexStringMatrix:
     def findall(self, ch: str) -> list[complex]:
         assert len(ch) == 1
         return [
-            complex(i, j) for i, row in enumerate(lines) for j, c in enumerate(row) if c == ch
+            complex(j, i) for i, row in enumerate(lines) for j, c in enumerate(row) if c == ch
         ]
 
     def read(self, pos: complex) -> str:
@@ -237,6 +237,16 @@ class ComplexStringMatrix:
         if 0 <= row < len(self._lines) and 0 <= col < len(self._lines[row]):
             return self._lines[row][col]
         return ''
+
+    def neigh4diag(self, pos: complex) -> list[complex]:
+        row = int(pos.imag)
+        col = int(pos.real)
+        return [complex(col + a, row + b) for a in (-1, 0, 1) for b in (-1, 0, 1) if a and b]
+
+    def neigh8(self, pos: complex) -> list[complex]:
+        row = int(pos.imag)
+        col = int(pos.real)
+        return [complex(col + a, row + b) for a in (-1, 0, 1) for b in (-1, 0, 1) if not a == b == 0]
 
 
 class InputScanner:
