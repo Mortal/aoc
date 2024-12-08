@@ -1,7 +1,6 @@
 import bisect
 from aoc import cmat
-# 8:16:36
-# 8:24
+
 start, = cmat.findall("^")
 g = start
 obs = set(cmat.findall("#"))
@@ -12,6 +11,57 @@ for p in cmat.findall("#"):
     bycol.setdefault(int(p.real), []).append(int(p.imag))
 dir = complex(0,-1)
 visited = {}
+
+def go(pos: complex, dir: complex) -> complex | None:
+    if dir == 1 or dir == -1:
+        try:
+            myrow = byrow[int(pos.imag)]
+        except KeyError:
+            return None
+        # right or left
+        myix = bisect.bisect(myrow, int(pos.imag))
+        if dir == -1:
+            # left: subtract one
+            myix -= 1
+        if 0 <= myix < len(myrow):
+            return complex(myrow[myix], pos.imag) - dir
+        return None
+
+    try:
+        mycol = bycol[int(pos.real)]
+    except KeyError:
+        return None
+    # down or up
+    myix = bisect.bisect(mycol, int(pos.real))
+    if dir == -1j:
+        # up: subtract one
+        myix -= 1
+    if 0 <= myix < len(mycol):
+        return complex(pos.real, mycol[myix]) - dir
+    return None
+
+g = go(start, 1j)
+if g is None:
+    g = complex(start.real, len(cmat))
+dir = complex(0,-1)
+longmoves = []
+while True:
+    gg = go(g, dir)
+    if gg is None:
+        if dir == 1j:
+            gg = complex(g.real, len(cmat))
+        elif dir == -1j:
+            gg = complex(g.real, 0)
+        elif dir == 1:
+            gg = complex(len(cmat[0]), g.imag)
+        else:
+            gg = complex(0, g.imag)
+        longmoves.append((g, gg))
+        break
+    longmoves.append((g, gg))
+    g = gg
+    dir = dir * 1j
+
 
 positions = []
 count = 0
