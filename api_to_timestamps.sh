@@ -10,9 +10,10 @@ to_entries[]|
 .value|
 to_entries[]|
 .key as $star|
+((.value.get_star_ts|tonumber)-("\($event)-12-\($day)T05:00:00Z"|fromdateiso8601)) as $totalseconds|
 [
 "\($event)d\($day)",
-(.value.get_star_ts|todate),
+(if $totalseconds >= 24*3600 then "+24" else $totalseconds|strftime("%H:%M:%S") end),
 "star\($star)",
 $name
 ]|@tsv' -cr
