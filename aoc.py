@@ -57,16 +57,28 @@ def _aoc_run(cliargs: Any, loader: importlib.abc.Loader, module: types.ModuleTyp
         section.splitlines()
         for section in inp.strip("\n").split("\n\n")
     ]
-    sectiontoks = [
-        [
+    try:
+        sectiontoks = [
             [
-                int(w) if w[-1] in "0123456789" else w
-                for w in re.findall("([^0-9 ,;.=-][^0-9 ,;.=]*|-?[0-9]+)-?", line)
+                [
+                    int(w) if w[-1] in "0123456789" else w
+                    for w in re.findall("([^0-9 ,;.=-][^0-9 ,;.=]*|-?[0-9]+)-?", line)
+                ]
+                for line in lines
             ]
-            for line in lines
+            for lines in sectionlines
         ]
-        for lines in sectionlines
-    ]
+    except ValueError:
+        sectiontoks = [
+            [
+                [
+                    w
+                    for w in re.findall("([^0-9 ,;.=-][^0-9 ,;.=]*|-?[0-9]+)-?", line)
+                ]
+                for line in lines
+            ]
+            for lines in sectionlines
+        ]
     sectionints = [[[i for i in line if isinstance(i, int)] for line in section] for section in sectiontoks]
     linetoks = [line for section in sectiontoks for line in section]
     lineints = [[i for i in line if isinstance(i, int)] for line in linetoks]
