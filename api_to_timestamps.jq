@@ -1,5 +1,4 @@
-#!/bin/bash
-exec jq '
+#!/usr/bin/jq -crf
 .event as $event|
 .members|
 to_entries[]|
@@ -25,4 +24,4 @@ else
 end),
 "star\($star)",
 $name
-]|@tsv' -cr
+]|@tsv
