@@ -2,7 +2,7 @@
 .event as $event|
 .members|
 to_entries[]|
-.value.name as $name|
+(if .value.name then .value.name else "(anonymous user \(.value.id))" end) as $name|
 .value.completion_day_level|
 to_entries[]|
 (.key|tonumber) as $day|
