@@ -144,6 +144,9 @@ class Bfs:
         self._i = 0
         return self
 
+    def multi(self) -> None:
+        self([])
+
     def __iter__(self) -> "Bfs":
         assert self._i == 0
         return self
@@ -154,6 +157,16 @@ class Bfs:
         v = self._bfs[self._i]
         self._i += 1
         return v
+
+    def newsource(self, pos: tuple[int, int]) -> bool:
+        assert self._i == len(self._bfs)
+        if pos in self.dist:
+            return False
+        self._bfs = [pos]
+        self.dist[pos] = 0
+        self.parent[pos] = pos
+        self._i = 0
+        return True
 
     def enqueue(self, pos: tuple[int, int]) -> bool:
         assert 1 <= self._i <= len(self._bfs)

@@ -3,19 +3,17 @@ from aoc import mat
 
 p1 = 0
 p2 = 0
-visited = set()
-mat.bfs([])
+mat.bfs.multi()
 for i in range(len(mat)):
     for j in range(len(mat[0])):
         start = (i, j)
-        if start in visited:
+        if not mat.bfs.newsource(start):
             continue
         ch = mat.read(start)
         area = 0
         peri = 0
-        sides = {}
-        for pos in mat.bfs(start):
-            visited.add(pos)
+        sides: dict[tuple[int, int], list[tuple[int, int]]] = {}
+        for pos in mat.bfs:
             area += 1
             for n in mat.neigh4(pos):
                 if mat.read(n) == ch:
