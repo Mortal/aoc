@@ -204,6 +204,14 @@ class TupleStringMatrix:
             return self._lines[i][j]
         return ''
 
+    def neigh4(self, ij: tuple[int, int]) -> Iterator[tuple[int, int]]:
+        i, j = ij
+        n, m = self.shape
+        yield i - 1, j
+        yield i + 1, j
+        yield i, j - 1
+        yield i, j + 1
+
     def neigh4inside(self, ij: tuple[int, int]) -> Iterator[tuple[int, int]]:
         i, j = ij
         n, m = self.shape
