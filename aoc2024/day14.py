@@ -5,23 +5,20 @@ if "samp" in path:
 else:
     w,h=101,103
 
-for i in (100 % (w*h), 7916):
-    q = {(a,b):0 for a in (True, False) for b in (True, False)}
-    p = {}
-    for px, py, vx, vy in lineints:
-        px += i * vx
-        px %= w
-        py += i * vy
-        py %= h
-        p[px, py] = 1
-        if px == w // 2 or py == h // 2:
-            continue
+def positions(time: int) -> list[tuple[int, int]]:
+    return [((px + time * vx) % w, (py + time * vy) % h) for px, py, vx, vy in lineints]
 
-        q[px < w // 2, py < h // 2] += 1
-    a,b,c,d = q.values()
-    if i == 100 % (w*h):
-        print("p1")
-        print(a*b*c*d)
-    print(i, a,b,c,d, "<"*(max([sum((i, j) in p for j in range(w)) for i in range(h)])), ">"* (max([sum((i, j) in p for i in range(h)) for j in range(w)])))
-    for i in range(h):
-        print("".join(".@"[(j,i) in p] for j in range(w)))
+p1pos = positions(100)
+a = sum(x < w//2 and y < h//2 for x,y in p1pos)
+b = sum(x > w//2 and y < h//2 for x,y in p1pos)
+c = sum(x < w//2 and y > h//2 for x,y in p1pos)
+d = sum(x > w//2 and y > h//2 for x,y in p1pos)
+p1 = a*b*c*d
+
+p2 = max(range(w*h), key=lambda i: max(Counter(x for x, y in positions(i)).values()) * max(Counter(y for x, y in positions(i)).values()))
+p2pos = set(positions(p2))
+for i in range(h):
+    print("".join(".@"[(j,i) in p2pos] for j in range(w)))
+
+print(p1)
+print(p2)
