@@ -8,7 +8,7 @@ import importlib.util
 import os
 import re
 import sys
-from typing import Any, Iterator
+from typing import Any, Generic, Iterator, TypeVar
 from math import ceil, gcd  # type: ignore[import]
 from collections import Counter  # type: ignore[import]
 
@@ -123,11 +123,14 @@ def _aoc_run(cliargs: Any, loader: importlib.abc.Loader, module: types.ModuleTyp
     return last_line.rstrip("\n")
 
 
-class Bfs:
+V = TypeVar("V")
+
+
+class Bfs(Generic[V]):
     def __init__(self, lines: list[str] | list[list[str]]) -> None:
         self._lines = lines
 
-    def __call__(self, inits: list[tuple[int, int]] | tuple[int, int] | dict[tuple[int, int], int]) -> "Bfs":
+    def __call__(self, inits: list[V] | V | dict[V, int]) -> "Bfs":
         if isinstance(inits, list):
             self._bfs = [*inits]
             self.dist = {s: 0 for s in inits}
@@ -137,7 +140,7 @@ class Bfs:
             self._bfs = list(inits)
             self.parent = {s: s for s in inits}
         else:
-            assert isinstance(inits, tuple)
+            assert isinstance(inits, tuple | complex)
             self.dist = {inits: 0}
             self._bfs = [inits]
             self.parent = {inits: inits}
@@ -151,14 +154,14 @@ class Bfs:
         assert self._i == 0
         return self
 
-    def __next__(self) -> tuple[int, int]:
+    def __next__(self) -> V:
         if self._i >= len(self._bfs):
             raise StopIteration
         v = self._bfs[self._i]
         self._i += 1
         return v
 
-    def newsource(self, pos: tuple[int, int]) -> bool:
+    def newsource(self, pos: V) -> bool:
         assert self._i == len(self._bfs)
         if pos in self.dist:
             return False
@@ -168,7 +171,7 @@ class Bfs:
         self._i = 0
         return True
 
-    def enqueue(self, pos: tuple[int, int]) -> bool:
+    def enqueue(self, pos: V) -> bool:
         assert 1 <= self._i <= len(self._bfs)
         cur = self._bfs[self._i - 1]
         if pos in self.dist:
@@ -182,7 +185,7 @@ class Bfs:
 class TupleStringMatrix:
     def __init__(self, lines: list[str]) -> None:
         self._lines = [list(line) for line in lines]
-        self.bfs = Bfs(self._lines)
+        self.bfs = Bfs[tuple[int, int]](self._lines)
 
     @property
     def shape(self) -> tuple[int, int]:
@@ -245,6 +248,7 @@ class TupleStringMatrix:
 class ComplexStringMatrix:
     def __init__(self, lines: list[str]) -> None:
         self._lines = lines
+        self.bfs = Bfs[complex](self._lines)
         self.shape = len(lines), len(lines[0])
         "shape is (rows, columns)"
 
@@ -275,6 +279,14 @@ class ComplexStringMatrix:
         row = int(pos.imag)
         col = int(pos.real)
         return [complex(col + a, row + b) for a in (-1, 0, 1) for b in (-1, 0, 1) if a and b]
+
+    def neigh4(self, ij: complex) -> Iterator[complex]:
+        i = int(ij.imag)
+        j = int(ij.real)
+        yield complex(j, i - 1)
+        yield complex(j, i + 1)
+        yield complex(j - 1, i)
+        yield complex(j + 1, i)
 
     def neigh8(self, pos: complex) -> list[complex]:
         row = int(pos.imag)
