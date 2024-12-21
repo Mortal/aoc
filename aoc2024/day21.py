@@ -1,5 +1,4 @@
 from aoc import lines, Counter
-from typing import Iterator
 
 keypad = {ch: complex(j, i) for i, line in enumerate(
     ("789", "456", "123", " 0A"))
@@ -11,25 +10,31 @@ dirpad = {ch: complex(j, i) for i, line in enumerate(
 
 
 def looksee(line: str, pad: dict[str, complex]) -> str:
+    # ^ > 7 9
+    # < ^ 7 9
+    # < v 4 8
+    # v > 4 8
     pos = pad["A"]
     blank = pad[" "]
     dirs = []
     for ch in line:
         dest = pad[ch]
         d = dest - pos
-        # >^v<
-        if d.imag > 0 and blank != complex(pos.real, dest.imag):
-            dirs.append(int(d.imag) * "v")
-        if d.real > 0:
-            dirs.append(int(d.real) * ">")
+        # <v^>
         if d.real < 0 and blank != complex(dest.real, pos.imag):
             dirs.append(int(-d.real) * "<")
-        if d.imag < 0:
-            dirs.append(int(-d.imag) * "^")
-        if d.imag > 0 and blank == complex(pos.real, dest.imag):
+        if d.imag > 0 and blank != complex(pos.real, dest.imag):
             dirs.append(int(d.imag) * "v")
+        if d.imag < 0 and blank != complex(pos.real, dest.imag):
+            dirs.append(int(-d.imag) * "^")
+        if d.real > 0:
+            dirs.append(int(d.real) * ">")
+        if d.imag < 0 and blank == complex(pos.real, dest.imag):
+            dirs.append(int(-d.imag) * "^")
         if d.real < 0 and blank == complex(dest.real, pos.imag):
             dirs.append(int(-d.real) * "<")
+        if d.imag > 0 and blank == complex(pos.real, dest.imag):
+            dirs.append(int(d.imag) * "v")
         dirs.append("A")
         pos = dest
     return "".join(dirs)
