@@ -62,6 +62,7 @@ def looksee2(line: Counter[str]) -> Counter[str]:
 
 p1 = 0
 p2 = 0
+m = 0
 for line in lines:
     dirs1 = looksee(line, keypad)
     dirs2 = looksee(dirs1, dirpad)
@@ -80,5 +81,7 @@ for line in lines:
             # p1 += (int(line[:-1]) * sum(dd.values()))
         dd = looksee2(dd)
     p2 += (int(line[:-1]) * sum(dd.values()))
+    m = max(m, sum(dd.values()))
+print(m)
 print(p1)
 print(p2)
