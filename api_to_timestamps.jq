@@ -1,2 +1,2 @@
 #!/bin/sh
-./api_parse.jq|./parse_print.jq
+./api_parse.jq|sort -u|./parse_print.jq|sort
