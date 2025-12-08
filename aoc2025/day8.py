@@ -18,12 +18,13 @@ def findrep(i):
 
 conns = 0
 for dist, i, j in dists:
-    print(dist, i, j, findrep(i), findrep(j), lineints[i], lineints[j])
+    # print(dist, i, j, findrep(i), findrep(j), lineints[i], lineints[j])
     if findrep(i) != findrep(j):
         rep[findrep(i)] = findrep(j)
-    conns += 1
-    if conns == 1000:
-        break
+        conns += 1
+        if conns == n - 1:
+            print(lineints[i][0] * lineints[j][0])
+            exit()
 sizes = {}
 for i in range(n):
     r = findrep(i)
