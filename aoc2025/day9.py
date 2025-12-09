@@ -30,24 +30,30 @@ for y in range(1, len(yc)):
         assert ygrid[y][x] in (0, 1), (x, y, ygrid[y][x])
         assert xgrid[y][x] == ygrid[y][x]
 
-print(
-    max(
-        (abs(x1 - x2 + 1) * abs(y1 - y2 + 1))
-        for x1, y1 in lineints
-        for x2, y2 in lineints
-        if all(
-            xgrid[y][x] == 1
-            for y in range(yc[min(y1, y2)], yc[max(y1, y2)])
-            for x in range(xc[min(x1, x2)], xc[max(x1, x2)])
-        )
+# for x1, y1 in lineints:
+#    for x2, y2 in lineints:
+#
+
+grid = [
+    ["," if xgrid[y][x] == 1 else "." for x in range(len(xc))] for y in range(len(yc))
+]
+for x, y in lineints:
+    grid[yc[y]][xc[x]] = "#"
+results = sorted(
+    ((abs(x1 - x2) + 1) * (abs(y1 - y2) + 1), x1, y1, x2, y2)
+    for x1, y1 in lineints
+    for x2, y2 in lineints
+    if all(
+        xgrid[y][x] == 1
+        for y in range(yc[min(y1, y2)], yc[max(y1, y2)])
+        for x in range(xc[min(x1, x2)], xc[max(x1, x2)])
     )
 )
-
-# for x, y in lineints:
-#    grid[yc[y]][xc[x]] = '#'
-# grid[yc[py1]][xc[px1]] = '1'
-# grid[yc[py2]][xc[px2]] = '2'
-# for row in grid:
-#    print(''.join(row))
-# print((max(xs)-min(xs)+1)*(max(ys)-min(ys)+1))
-# print((1+len(xc))*(1+len(yc)))
+for res in results[-10:]:
+    print(*res)
+p2, px1, py1, px2, py2 = results[-1]
+grid[yc[py1]][xc[px1]] = "@"
+grid[yc[py2]][xc[px2]] = "@"
+for row in grid:
+    print("".join(row))
+print(p2)
