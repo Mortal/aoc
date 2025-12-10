@@ -1,25 +1,25 @@
 from aoc import lines
 p1 = 0
 for line in lines:
-    goal_str, *buttons_str, jolt_str = line.split()
-    goal = sum(2**i for i, c in enumerate(goal_str[1:-1]) if c == "#")
-    buttons = [sum(2**int(v) for v in button_str[1:-1].split(",")) for button_str in buttons_str]
-    print(bin(goal), [bin(b) for b in buttons])
-    dists = {0: 0}
+    goal1_str, *buttons_str, goal2_str = line.split()
+    goal1 = sum(2**i for i, c in enumerate(goal1_str[1:-1]) if c == "#")
+    buttons1 = [sum(2**int(v) for v in button_str[1:-1].split(",")) for button_str in buttons_str]
+    print(bin(goal1), [bin(b) for b in buttons1])
+    dists1 = {0: 0}
     bfs = [0]
     i = 0
     while i < len(bfs):
         st = bfs[i]
         i += 1
-        for b in buttons:
+        for b in buttons1:
             n = st ^ b
-            if n not in dists:
-                dists[n] = dists[st] + 1
-                if n == goal:
+            if n not in dists1:
+                dists1[n] = dists1[st] + 1
+                if n == goal1:
                     break
                 bfs.append(n)
-        if goal in dists:
+        if goal1 in dists1:
             break
-    print(dists[goal])
-    p1 += dists[goal]
+    print(dists1[goal1])
+    p1 += dists1[goal1]
 print(p1)
