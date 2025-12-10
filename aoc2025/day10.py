@@ -1,5 +1,5 @@
 from aoc import lines
-from z3.z3 import *
+from z3.z3 import Int, Optimize
 p1 = 0
 p2 = 0
 for line in lines:
@@ -34,9 +34,8 @@ for line in lines:
     solver.minimize(sum(vars))
     for i in range(len(goal2)):
         solver.add(sum(vars[j] for j in range(len(buttons2)) if i in buttons2[j]) == goal2[i])
-    print(solver.check())
+    solver.check()
     res = solver.model().eval(sum(vars))
-    print(res)
     p2 += int(res.as_long())
 print(p1)
 print(p2)
