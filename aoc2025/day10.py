@@ -1,5 +1,7 @@
 from aoc import lines
+from z3.z3 import *
 p1 = 0
+p2 = 0
 for line in lines:
     goal1_str, *buttons_str, goal2_str = line.split()
     goal1 = sum(2**i for i, c in enumerate(goal1_str[1:-1]) if c == "#")
@@ -20,4 +22,21 @@ for line in lines:
         if goal1 in dists1:
             break
     p1 += dists1[goal1]
+
+    goal2 = tuple(map(int, goal2_str[1:-1].split(',')))
+    buttons2 = [tuple(map(int, button_str[1:-1].split(','))) for button_str in buttons_str]
+    zero = (0,)*len(goal2)
+    dists2 = {zero: 0}
+    vars = [Int(f"b{i}") for i in range(len(buttons2))]
+    solver = Optimize()
+    for var in vars:
+        solver.add(var >= 0)
+    solver.minimize(sum(vars))
+    for i in range(len(goal2)):
+        solver.add(sum(vars[j] for j in range(len(buttons2)) if i in buttons2[j]) == goal2[i])
+    print(solver.check())
+    res = solver.model().eval(sum(vars))
+    print(res)
+    p2 += int(res.as_long())
 print(p1)
+print(p2)
