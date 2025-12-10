@@ -4,7 +4,6 @@ for line in lines:
     goal1_str, *buttons_str, goal2_str = line.split()
     goal1 = sum(2**i for i, c in enumerate(goal1_str[1:-1]) if c == "#")
     buttons1 = [sum(2**int(v) for v in button_str[1:-1].split(",")) for button_str in buttons_str]
-    print(bin(goal1), [bin(b) for b in buttons1])
     dists1 = {0: 0}
     bfs = [0]
     i = 0
@@ -20,6 +19,5 @@ for line in lines:
                 bfs.append(n)
         if goal1 in dists1:
             break
-    print(dists1[goal1])
     p1 += dists1[goal1]
 print(p1)
