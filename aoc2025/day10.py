@@ -1,5 +1,6 @@
 from aoc import lines
-from z3.z3 import Int, Optimize
+import z4
+
 p1 = 0
 p2 = 0
 for line in lines:
@@ -27,15 +28,15 @@ for line in lines:
     buttons2 = [tuple(map(int, button_str[1:-1].split(','))) for button_str in buttons_str]
     zero = (0,)*len(goal2)
     dists2 = {zero: 0}
-    vars = [Int(f"b{i}") for i in range(len(buttons2))]
-    solver = Optimize()
-    for var in vars:
-        solver.add(var >= 0)
-    solver.minimize(sum(vars))
-    for i in range(len(goal2)):
-        solver.add(sum(vars[j] for j in range(len(buttons2)) if i in buttons2[j]) == goal2[i])
-    solver.check()
-    res = solver.model().eval(sum(vars))
-    p2 += int(res.as_long())
+    vars = [z4.Int(f"b{i}") for i in range(len(buttons2))]
+    res = z4.minimize(
+        sum(vars),
+        [var >= 0 for var in vars]
+        + [
+            sum(vars[j] for j in range(len(buttons2)) if i in buttons2[j]) == goal2[i]
+            for i in range(len(goal2))
+        ],
+    )
+    p2 += int(res[0].as_long())
 print(p1)
 print(p2)
